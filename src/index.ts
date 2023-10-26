@@ -3,7 +3,6 @@ import { enhanceEvent } from "./event.ts";
 import { enhanceFetch } from "./fetch.ts";
 import { clickHandler, anchorHandler, eventEmitHandler, popStateHandler, anchorNavigate } from "./navigate.ts";
 import { formEvent } from "./form.ts";
-import "./register.ts";
 
 window.addEventListener('popstate', popStateHandler)
 document.addEventListener('submit', formEvent)
