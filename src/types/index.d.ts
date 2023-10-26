@@ -1,3 +1,4 @@
+/// <reference types="./extra.d.ts"/>
 import type { enhanceEvent } from "../event"
 import type { Enhance } from "../index"
 
