@@ -27,11 +27,13 @@ export async function build(opt = {
     }
   }
 
-  return await Bun.build({
+  const res = await Bun.build({
     entrypoints: [indexDir],
     target: 'browser',
     outdir: opt.outdir,
     naming: { entry: index },
     minify: true,
   })
+
+  res.logs.forEach(console.log)
 }
