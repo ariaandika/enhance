@@ -1,5 +1,5 @@
 import type { enhanceEvent } from "../event"
-import type { Enhance } from "../register"
+import type { Enhance } from "../index"
 
 declare global {
   var enhance: Enhance
