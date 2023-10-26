@@ -1,20 +1,5 @@
-import { event } from "./event";
+import { enhanceEvent } from "./event";
 import { LOCATION_HEADER, REQUEST_HEADER, MODULE_HEADER } from "./main";
-
-document.querySelectorAll('script[opt]').forEach(async e => {
-  const src = e.getAttribute('src')!
-  const opt = new URLSearchParams(e.getAttribute('opt')!)
-  let app = await import(src)
-
-  if (opt.get('exec') === 'always') {
-    await app.default()
-  }
-
-  if (opt.has('global')) {
-    // @ts-ignore
-    window[opt.get('global')] = app
-  }
-})
 
 function reverseProxy(res: Response) {
   let targetLocation = res.headers.get(LOCATION_HEADER)
@@ -46,7 +31,7 @@ async function parseModulesHeader(mods: string | null) {
   }
 }
 
-export async function httpFetch(url: string, opt?: Parameters<typeof fetch>[1]) {
+export async function enhanceFetch(url: string, opt?: Parameters<typeof fetch>[1]) {
   const o = opt ?? {} as any
 
   o.headers ??= {} as any
@@ -60,7 +45,7 @@ export async function httpFetch(url: string, opt?: Parameters<typeof fetch>[1]) 
     reverseProxy(res)
     return res
   } catch (error) {
-    event.emit('exception',{ error })
+    enhanceEvent.emit('exception',{ error })
     throw error
   }
 }

@@ -1,18 +1,11 @@
-import { event } from "./event"
-import { httpFetch } from "./fetch"
+import { emitKeypressEvents } from "readline"
+import { enhanceEvent } from "./event"
+import { enhanceFetch } from "./fetch"
 import { DEF_APP, DEF_SWAP, EMIT, GET, POST, applyDomAction, parseDomAction, query, } from "./main"
-import type { Api } from "./api"
 
 type popstate = { html: string, appId: string, swap: string }
 
-window.addEventListener('popstate', popState)
-document.addEventListener('click', anchor)
-document.addEventListener('click', click)
-document.addEventListener('click', eventEmmiter)
-
-declare const prevent: event
-
-function popState(e: PopStateEvent) {
+export function popStateHandler(e: PopStateEvent) {
   if (e.state) {
     const { html, appId, swap } = e.state as popstate
 
@@ -27,7 +20,7 @@ function popState(e: PopStateEvent) {
 }
 
 
-async function anchor(e: MouseEvent) {
+export async function anchorHandler(e: MouseEvent) {
   const target = e.target as HTMLAnchorElement
   const dom = parseDomAction(target)
   const currentApp = app(dom.targetAtr)
@@ -54,16 +47,16 @@ export async function anchorNavigate(href: string, {
   appId = DEF_APP,
   pushState = true
 }) {
-  const res = await httpFetch(href)
+  const res = await enhanceFetch(href)
   const html = await res.text()
   
   if (pushState) {
     history.pushState({ html, appId, swap } satisfies popstate,'',href);
   }
 
-  prevent.emit('preClientNavigate', { url: href })
+  enhanceEvent.emit('preClientNavigate', { url: href })
   applyDomAction({ target, swap }, html)
-  prevent.emit('clientNavigate', { url: href })
+  enhanceEvent.emit('clientNavigate', { url: href })
 }
 
 
@@ -75,7 +68,7 @@ function app(custom?: string | null) {
 
 const actions = [GET,POST]
 
-async function click(e: MouseEvent) {
+export async function clickHandler(e: MouseEvent) {
   const target = e.target as HTMLElement
   const dom = parseDomAction(target)
   const name = target.getAttribute('name')
@@ -100,15 +93,13 @@ async function click(e: MouseEvent) {
     return
   }
   
-  const res = await httpFetch(action, { method, body })
+  const res = await enhanceFetch(action, { method, body })
   const html = await res.text()
 
   applyDomAction(dom, html)
 }
 
-declare const api: Api
-
-function eventEmmiter(e: MouseEvent) {
+export function eventEmitHandler(e: MouseEvent) {
   const target = e.target as HTMLElement
   const eventString = target.getAttribute(EMIT)
 
@@ -116,5 +107,5 @@ function eventEmmiter(e: MouseEvent) {
 
   const eventFragments = eventString.split(' ')
 
-  api.emit(eventFragments[0], eventFragments.slice(1).join(''))
+  enhanceEvent.emit(eventFragments[0], eventFragments.slice(1).join(''))
 }

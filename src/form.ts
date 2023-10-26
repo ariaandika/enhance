@@ -1,14 +1,11 @@
 /// <reference lib="dom"/>
 /// <reference lib="dom.iterable"/>
 
-import { httpFetch } from "./fetch";
+import { enhanceFetch } from "./fetch";
 import { parseDomAction, applyDomAction, INVALIDATE, FORM_INCLUDE, query, NO_RESET } from "./main";
-import { event } from "./event";
+import { enhanceEvent } from "./event";
 
-document.addEventListener('submit', formEvent)
-
-
-async function formEvent(e: SubmitEvent) {
+export async function formEvent(e: SubmitEvent) {
   e.preventDefault()
 
   const target = e.target as HTMLFormElement
@@ -44,7 +41,7 @@ async function formEvent(e: SubmitEvent) {
     body = undefined as any
   }
 
-  const res = await httpFetch(action,{
+  const res = await enhanceFetch(action,{
     method, body,
   })
 
@@ -60,7 +57,7 @@ async function formEvent(e: SubmitEvent) {
   }
 
   if (invalidate && ok) {
-    event.emit('invalidate',{id:target.id})
+    enhanceEvent.emit('invalidate',{id:target.id})
   }
 
   const dom = parseDomAction(target)
@@ -70,18 +67,4 @@ async function formEvent(e: SubmitEvent) {
 function resetInput(target: Element, query: string) {
   target.querySelectorAll(query).forEach((e:any) => e.value = '')
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
